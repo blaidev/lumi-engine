@@ -13,8 +13,7 @@ class HealthIcon extends FlxSprite
 	{
 		super();
 		loadGraphic(Paths.image('iconGrid'), true, 150, 150);
-
-		antialiasing = true;
+		
 		animation.add('bf', [0, 1], 0, false, isPlayer);
 		animation.add('bf-car', [0, 1], 0, false, isPlayer);
 		animation.add('bf-christmas', [0, 1], 0, false, isPlayer);
@@ -26,7 +25,7 @@ class HealthIcon extends FlxSprite
 		animation.add('tankman', [8, 9], 0, false, isPlayer);
 		animation.add('face', [10, 11], 0, false, isPlayer);
 		animation.add('dad', [12, 13], 0, false, isPlayer);
-		animation.add('senpai', [22, 22], 0, false, isPlayer);
+		//animation.add('senpai', [22, 22], 0, false, isPlayer);
 		animation.add('senpai-angry', [22, 22], 0, false, isPlayer);
 		animation.add('spirit', [23, 23], 0, false, isPlayer);
 		animation.add('bf-old', [14, 15], 0, false, isPlayer);
@@ -34,7 +33,17 @@ class HealthIcon extends FlxSprite
 		animation.add('parents-christmas', [17], 0, false, isPlayer);
 		animation.add('monster', [19, 20], 0, false, isPlayer);
 		animation.add('monster-christmas', [19, 20], 0, false, isPlayer);
+
 		animation.play(char);
+
+		if (PlayState.storyWeek == 7)
+			antialiasing = false;
+		else
+			antialiasing = true;
+
+		if (animation.curAnim == null) {
+			animation.play('face');
+		}
 		scrollFactor.set();
 	}
 
