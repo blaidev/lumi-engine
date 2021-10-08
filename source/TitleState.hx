@@ -1,5 +1,6 @@
 package;
 
+import OptionsMenu.OptionFunctions;
 #if desktop
 import Discord.DiscordClient;
 import sys.thread.Thread;
@@ -48,6 +49,9 @@ class TitleState extends MusicBeatState
 	{
 
 		PlayerSettings.init();
+
+		//OptionFunctions.reset();
+		//FlxG.save.flush();
 
 		if (FlxG.save.data.dfjk)
 			controls.setKeyboardScheme(DFJK);

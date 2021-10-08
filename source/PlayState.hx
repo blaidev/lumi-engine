@@ -696,6 +696,9 @@ class PlayState extends MusicBeatState
 		Conductor.songPosition = -5000;
 
 		strumLine = new FlxSprite(0, 50).makeGraphic(FlxG.width, 10);
+		if (FlxG.save.data.downscroll) {
+			strumLine.y = FlxG.height - 150;
+		}
 		strumLine.scrollFactor.set();
 
 		strumLineNotes = new FlxTypedGroup<FlxSprite>();
@@ -733,6 +736,9 @@ class PlayState extends MusicBeatState
 		healthBarBG = new FlxSprite(0, FlxG.height * 0.9).loadGraphic(Paths.image('healthBar'));
 		healthBarBG.screenCenter(X);
 		healthBarBG.scrollFactor.set();
+		if (FlxG.save.data.downscroll) {
+			healthBarBG.y = 0.11 * FlxG.height;
+		}
 		add(healthBarBG);
 
 		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
@@ -1477,6 +1483,10 @@ class PlayState extends MusicBeatState
 			// Conductor.lastSongPos = FlxG.sound.music.time;
 		}
 
+		if (generatedMusic) {
+			notes.sort(FlxSort.byY, FlxG.save.data.downscroll ? FlxSort.DESCENDING : FlxSort.ASCENDING);
+		}
+
 		if (generatedMusic && PlayState.SONG.notes[Std.int(curStep / 16)] != null)
 		{
 			if (curBeat % 4 == 0)
@@ -1637,58 +1647,123 @@ class PlayState extends MusicBeatState
 					daNote.active = true;
 				}
 
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(SONG.speed, 2)));
+				if (!FlxG.save.data.downscroll) {
+					daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(SONG.speed, 2)));
 
-				// i am so fucking sorry for this if condition
-				if (daNote.isSustainNote
-					&& daNote.y + daNote.offset.y <= strumLine.y + Note.swagWidth / 2
-					&& (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
-				{
-					var swagRect = new FlxRect(0, strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
-					swagRect.y /= daNote.scale.y;
-					swagRect.height -= swagRect.y;
-
-					daNote.clipRect = swagRect;
-				}
-
-				if (!daNote.mustPress && daNote.wasGoodHit)
-				{
-					if (SONG.song != 'Tutorial')
-						camZooming = true;
-
-					var altAnim:String = "";
-
-					if (SONG.notes[Math.floor(curStep / 16)] != null)
+					// i am so fucking sorry for this if condition
+					if (daNote.isSustainNote
+						&& daNote.y + daNote.offset.y <= strumLine.y + Note.swagWidth / 2
+						&& (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
 					{
-						if (SONG.notes[Math.floor(curStep / 16)].altAnim)
-							altAnim = '-alt';
+						var swagRect = new FlxRect(0, strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
+						swagRect.y /= daNote.scale.y;
+						swagRect.height -= swagRect.y;
+
+						daNote.clipRect = swagRect;
 					}
 
-					switch (Math.abs(daNote.noteData))
+					if (!daNote.mustPress && daNote.wasGoodHit)
 					{
-						case 0:
-							dad.playAnim('singLEFT' + altAnim, true);
-						case 1:
-							dad.playAnim('singDOWN' + altAnim, true);
-						case 2:
-							dad.playAnim('singUP' + altAnim, true);
-						case 3:
-							dad.playAnim('singRIGHT' + altAnim, true);
+						if (SONG.song != 'Tutorial')
+							camZooming = true;
+
+						var altAnim:String = "";
+
+						if (SONG.notes[Math.floor(curStep / 16)] != null)
+						{
+							if (SONG.notes[Math.floor(curStep / 16)].altAnim)
+								altAnim = '-alt';
+						}
+
+						switch (Math.abs(daNote.noteData))
+						{
+							case 0:
+								dad.playAnim('singLEFT' + altAnim, true);
+							case 1:
+								dad.playAnim('singDOWN' + altAnim, true);
+							case 2:
+								dad.playAnim('singUP' + altAnim, true);
+							case 3:
+								dad.playAnim('singRIGHT' + altAnim, true);
+						}
+
+						dad.holdTimer = 0;
+
+						if (SONG.needsVoices)
+							vocals.volume = 1;
+
+						daNote.kill();
+						notes.remove(daNote, true);
+						daNote.destroy();	
+					}
+				} else {daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(SONG.speed, 2)));
+
+					if (daNote.isSustainNote) {
+						if (daNote.animation.curAnim.name.endsWith("end") && daNote.prevNote != null)
+							{
+								daNote.y += daNote.prevNote.height + 9;
+								daNote.flipY = true;
+							}
+							else
+							{
+								daNote.flipY = false;
+								daNote.y += daNote.height / 2;
+							}
 					}
 
-					dad.holdTimer = 0;
+					if (daNote.isSustainNote
+						&& daNote.y + daNote.offset.y <= strumLine.y + Note.swagWidth / 2
+						&& (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
+					{
+						var swagRect = new FlxRect(0, 0, daNote.frameWidth * 2, daNote.frameHeight * 2);
+								swagRect.height = (strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].y
+									+ Note.swagWidth / 2
+									- daNote.y) / daNote.scale.y;
+								swagRect.y = daNote.frameHeight - swagRect.height;
 
-					if (SONG.needsVoices)
-						vocals.volume = 1;
+								daNote.clipRect = swagRect;
+					}
 
-					daNote.kill();
-					notes.remove(daNote, true);
-					daNote.destroy();
+					if (!daNote.mustPress && daNote.wasGoodHit)
+					{
+						if (SONG.song != 'Tutorial')
+							camZooming = true;
+
+						var altAnim:String = "";
+
+						if (SONG.notes[Math.floor(curStep / 16)] != null)
+						{
+							if (SONG.notes[Math.floor(curStep / 16)].altAnim)
+								altAnim = '-alt';
+						}
+
+						switch (Math.abs(daNote.noteData))
+						{
+							case 0:
+								dad.playAnim('singLEFT' + altAnim, true);
+							case 1:
+								dad.playAnim('singDOWN' + altAnim, true);
+							case 2:
+								dad.playAnim('singUP' + altAnim, true);
+							case 3:
+								dad.playAnim('singRIGHT' + altAnim, true);
+						}
+
+						dad.holdTimer = 0;
+
+						if (SONG.needsVoices)
+							vocals.volume = 1;
+
+						daNote.kill();
+						notes.remove(daNote, true);
+						daNote.destroy();	
+					}
 				}
 
 				// WIP interpolation shit? Need to fix the pause issue
 				// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
 
+				if (FlxG.save.data.downscroll == false)
 				if (daNote.y < -daNote.height)
 				{
 					if (daNote.tooLate || !daNote.wasGoodHit)
@@ -1715,6 +1790,34 @@ class PlayState extends MusicBeatState
 					daNote.kill();
 					notes.remove(daNote, true);
 					daNote.destroy();
+				}
+				  if (FlxG.save.data.downscroll == true)
+					if (daNote.y > FlxG.height)
+						{
+							if (daNote.tooLate || !daNote.wasGoodHit)
+							{
+								health -= 0.0475;
+								vocals.volume = 0;
+								if (FlxG.save.data.ghost) {
+								switch (daNote.noteData) {
+										case 0:
+											boyfriend.playAnim('singLEFTmiss');
+										case 1:
+											boyfriend.playAnim('singDOWNmiss');
+										case 2:
+											boyfriend.playAnim('singUPmiss');
+										case 3:
+											boyfriend.playAnim('singRIGHTmiss');
+									}
+								}
+							}
+		
+							daNote.active = false;
+							daNote.visible = false;
+		
+							daNote.kill();
+							notes.remove(daNote, true);
+							daNote.destroy();
 				}
 			});
 		}

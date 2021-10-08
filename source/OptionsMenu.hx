@@ -50,20 +50,16 @@ class OptionsMenu extends MusicBeatState
 		}
 	}
 
-	function createOptions(x:Float, ?startWhere:Int = 0, ?endWhere:Int = 3) {
+	function createOptions(x:Float, ?startWhere:Int = 0, ?endWhere:Int = 5) {
 		
 		var theBaby:Int = 0;
 
-		for (i in startWhere...endWhere) {
-			if (theBaby < endWhere) {
-				var button = new FlxButtonPlus(x, 0, callbacks[i], buttonStrings[i], 125, 65);
-				button.y = ((button.y + 80) * i) + 45;
-				theBaby++;
-				button.onClickCallback = callbacks[i]; // just make sure
-				buttons.add(button);
-			} else {
-				break;
-			}
+		for (i in 0...buttonStrings.length) {
+			var button = new FlxButtonPlus(x, 0, callbacks[i], buttonStrings[i], 125, 65);
+			button.y = ((button.y + 80) * i) + 45;
+			theBaby++;
+			button.onClickCallback = callbacks[i]; // just make sure
+			buttons.add(button);
 		}
 	}
 
@@ -83,12 +79,17 @@ class OptionsMenu extends MusicBeatState
 		return FlxG.save.data.cursed ? "1356\nOn" : "1356\nOff"; 
 	}
 
+	function downscrollString() {
+		return FlxG.save.data.downscroll ? "Downscroll\nOn" : "Downscroll\nOff";
+	}
+
 	public function dumbRender() {
 		var bs = buttons.members;
 		bs[0].text = dfjkString();
-		bs[1].text = ghostString();
-		bs[2].text = noteString();
-		bs[3].text = cursedString();
+		bs[1].text = downscrollString();
+		bs[2].text = ghostString();
+		bs[3].text = noteString();
+		bs[4].text = cursedString();
 	}
 }
 
@@ -101,7 +102,7 @@ class OptionFunctions {
 		for (i in callbacksArray) {
 			OptionsMenu.callbacks.push(i);
 		}
-		OptionsMenu.buttonStrings = ['DFJK', 'Ghost Tapping', 'Note Splashes', '1356'];
+		OptionsMenu.buttonStrings = ['DFJK', 'Downscroll', 'Ghost Tapping', 'Note Splashes', '1356'];
 	}
 	
 	public static function setDFJK():String {
@@ -130,8 +131,15 @@ class OptionFunctions {
 		return FlxG.save.data.notesplash ? "1356\nOn" : "1356\nOff";
 	}
 
+	public static function setDownscroll() {
+		FlxG.save.data.downscroll = !FlxG.save.data.downscroll;
+		FlxG.save.flush();
+		return FlxG.save.data.downscroll ? "Downscroll On\n" : "Downscroll\nOff";
+	}
+
 	static function pushStuff() {
 		callbacksArray.push(setDFJK);
+		callbacksArray.push(setDownscroll);
 		callbacksArray.push(setGhostTapping);
 		callbacksArray.push(setNoteSplashes);
 		callbacksArray.push(set1356);
@@ -143,6 +151,7 @@ class OptionFunctions {
 		FlxG.save.data.ghost = true; // idk
 		FlxG.save.data.notesplash = true;
 		FlxG.save.data.cursed = false;
+		FlxG.save.data.downscroll = false;
 		FlxG.save.flush();
 	}
 }
