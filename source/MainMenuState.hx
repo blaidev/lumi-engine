@@ -36,6 +36,7 @@ class MainMenuState extends MusicBeatState
 
 	override function create()
 	{
+		FlxG.mouse.visible = false;
 		#if desktop
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
@@ -104,6 +105,13 @@ class MainMenuState extends MusicBeatState
 		// NG.core.calls.event.logEvent('swag').send();
 
 		changeItem();
+
+		if (FlxG.save.data.dfjk)
+			controls.setKeyboardScheme(DFJK);
+		else if (FlxG.save.data.cursed)
+			controls.setKeyboardScheme(Cursed);
+		else
+			controls.setKeyboardScheme(Solo);
 
 		super.create();
 	}

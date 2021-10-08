@@ -116,6 +116,8 @@ class PlayState extends MusicBeatState
 	var songScore:Int = 0;
 	var scoreTxt:FlxText;
 
+	var noteSplashes:FlxTypedGroup<NoteSplash> = new FlxTypedGroup<NoteSplash>();
+
 	public static var campaignScore:Int = 0;
 
 	var defaultCamZoom:Float = 1.05;
@@ -133,6 +135,13 @@ class PlayState extends MusicBeatState
 	var detailsText:String = "";
 	var detailsPausedText:String = "";
 	#end
+
+	// mash vio shit so u cant just spam in ghosttapping lmao
+	var mashVio:Int = 0;
+	var mashes = 0;
+	var altMashes = 0;
+	var mashTimerA:Float = 0;
+	var mashTimeA:Float = 2.0;
 
 	override public function create()
 	{
@@ -1053,7 +1062,7 @@ class PlayState extends MusicBeatState
 
 		notes = new FlxTypedGroup<Note>();
 		add(notes);
-
+		add(noteSplashes);
 		var noteData:Array<SwagSection>;
 
 		// NEW SHIT
@@ -1363,6 +1372,12 @@ class PlayState extends MusicBeatState
 		}
 
 		super.update(elapsed);
+
+		mashTimerA += elapsed;
+
+		if (FlxG.save.data.ghost) {
+			mashViolation();
+		}
 
 		scoreTxt.text = "Score:" + songScore;
 
@@ -1680,6 +1695,18 @@ class PlayState extends MusicBeatState
 					{
 						health -= 0.0475;
 						vocals.volume = 0;
+						if (FlxG.save.data.ghost) {
+						switch (daNote.noteData) {
+								case 0:
+									boyfriend.playAnim('singLEFTmiss');
+								case 1:
+									boyfriend.playAnim('singDOWNmiss');
+								case 2:
+									boyfriend.playAnim('singUPmiss');
+								case 3:
+									boyfriend.playAnim('singRIGHTmiss');
+							}
+						}
 					}
 
 					daNote.active = false;
@@ -1696,7 +1723,7 @@ class PlayState extends MusicBeatState
 			keyShit();
 
 		#if debug
-		if (FlxG.keys.justPressed.ONE)
+		if (FlxG.keys.justPressed.ONE && !FlxG.save.data.cursed)
 			endSong();
 		#end
 	}
@@ -1783,7 +1810,7 @@ class PlayState extends MusicBeatState
 
 	var endingSong:Bool = false;
 
-	private function popUpScore(strumtime:Float):Void
+	private function popUpScore(strumtime:Float, note:Note):Void
 	{
 		var noteDiff:Float = Math.abs(strumtime - Conductor.songPosition);
 		// boyfriend.playAnim('hey');
@@ -1805,16 +1832,26 @@ class PlayState extends MusicBeatState
 		{
 			daRating = 'shit';
 			score = 50;
+			if (FlxG.save.data.ghost) {
+				health -= 0.004;
+			}
 		}
 		else if (noteDiff > Conductor.safeZoneOffset * 0.75)
 		{
 			daRating = 'bad';
 			score = 100;
+			if (FlxG.save.data.ghost) {
+				health -= 0.001;
+			}
 		}
 		else if (noteDiff > Conductor.safeZoneOffset * 0.2)
 		{
 			daRating = 'good';
 			score = 200;
+		}
+
+		if (daRating == 'sick' && FlxG.save.data.notesplash) {
+			createNoteSplash(note);
 		}
 
 		songScore += score;
@@ -2003,7 +2040,9 @@ class PlayState extends MusicBeatState
 										inIgnoreList = true;
 								}
 								if (!inIgnoreList)
-									badNoteCheck();
+									if (!FlxG.save.data.ghost) {
+										badNoteCheck();
+									}
 							}
 						}
 					}
@@ -2057,6 +2096,12 @@ class PlayState extends MusicBeatState
 			else
 			{
 				badNoteCheck();
+			}
+		}
+
+		if ((upP || rightP || downP || leftP) && !boyfriend.stunned && generatedMusic) {
+			if (FlxG.save.data.ghost) {
+				mashes++;
 			}
 		}
 
@@ -2178,15 +2223,17 @@ class PlayState extends MusicBeatState
 		var rightP = controls.RIGHT_P;
 		var downP = controls.DOWN_P;
 		var leftP = controls.LEFT_P;
-
-		if (leftP)
-			noteMiss(0);
-		if (downP)
-			noteMiss(1);
-		if (upP)
-			noteMiss(2);
-		if (rightP)
-			noteMiss(3);
+		
+		if (!FlxG.save.data.ghost) {
+			if (leftP)
+				noteMiss(0);
+			if (downP)
+				noteMiss(1);
+			if (upP)
+				noteMiss(2);
+			if (rightP)
+				noteMiss(3);
+		}
 	}
 
 	function noteCheck(keyP:Bool, note:Note):Void
@@ -2195,7 +2242,9 @@ class PlayState extends MusicBeatState
 			goodNoteHit(note);
 		else
 		{
-			badNoteCheck();
+			if (!FlxG.save.data.ghost) {
+				badNoteCheck();
+			}
 		}
 	}
 
@@ -2205,14 +2254,22 @@ class PlayState extends MusicBeatState
 		{
 			if (!note.isSustainNote)
 			{
-				popUpScore(note.strumTime);
+				popUpScore(note.strumTime, note);
 				combo += 1;
 			}
 
-			if (note.noteData >= 0)
-				health += 0.023;
-			else
-				health += 0.004;
+			if (FlxG.save.data.ghost) {
+				if (note.noteData >= 0) {
+					health += 0.010;
+				} else {
+					health += 0.0018;
+				}
+			} else {
+				if (note.noteData >= 0)
+					health += 0.023;
+				else
+					health += 0.004;
+			}
 
 			switch (note.noteData)
 			{
@@ -2466,4 +2523,51 @@ class PlayState extends MusicBeatState
 	}
 
 	var curLight:Int = 0;
+
+	function mashViolation() {
+		if (mashes >= 22 && mashTimerA < mashTimeA) {
+			health -= 0.06;
+			mashVio++;
+			trace('HEY BUDDY DONT BUTTON MASH!! UR AT ', mashVio, "VIOLATIONs now :( u lose score & health !!");
+			trace('mf HIT', mashes, 'note');
+			songScore -= 200;
+			mashes = 0;
+			mashTimerA = 0;
+		}
+
+		if (mashTimerA >= mashTimeA) {
+			mashTimerA = 0;
+			trace('THE MAshes BE4 WE RESET:', mashes);
+			trace('mash timer A DONE ');
+			mashes = 0;
+			}
+		}
+
+		function createNoteSplash(note:Note) {
+			var pref:String = '';
+			var altStr:String = '';
+
+			var splash = new NoteSplash(note.x, note.y);
+			
+			switch (note.noteData) {
+				case 0:
+					pref = 'PURPLE';
+				case 1:
+					pref = 'BLUE';
+				case 2:
+					pref = 'GREEN';
+				case 3:
+					pref = 'RED';
+			}
+			splash.alpha = 1;
+
+			if (FlxG.random.bool()) {
+				altStr = 'alt';
+			} else {
+				altStr = '';
+			}
+			splash.animation.play(pref + altStr);
+			noteSplashes.add(splash);
+			
+		}
 }

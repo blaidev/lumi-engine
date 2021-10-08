@@ -83,7 +83,9 @@ enum Control
 enum KeyboardScheme
 {
 	Solo;
+	DFJK;
 	Duo(first:Bool);
+	Cursed;
 	None;
 	Custom;
 }
@@ -524,6 +526,24 @@ class Controls extends FlxActionSet
 				inline bindKeys(Control.BACK, [P]);
 				inline bindKeys(Control.PAUSE, [ENTER]);
 				inline bindKeys(Control.RESET, [BACKSPACE]);
+			case DFJK:
+				inline bindKeys(Control.UP, [FlxKey.J, FlxKey.UP]);
+				inline bindKeys(Control.DOWN, [FlxKey.F, FlxKey.DOWN]);
+				inline bindKeys(Control.LEFT, [FlxKey.D, FlxKey.LEFT]);
+				inline bindKeys(Control.RIGHT, [FlxKey.K, FlxKey.RIGHT]);
+				inline bindKeys(Control.ACCEPT, [Z, SPACE, ENTER]);
+				inline bindKeys(Control.BACK, [BACKSPACE, ESCAPE]);
+				inline bindKeys(Control.PAUSE, [P, ENTER, ESCAPE]);
+				inline bindKeys(Control.RESET, [R]);
+			case Cursed:
+				inline bindKeys(Control.UP, [FlxKey.FIVE, FlxKey.UP]);
+				inline bindKeys(Control.DOWN, [FlxKey.THREE, FlxKey.DOWN]);
+				inline bindKeys(Control.LEFT, [FlxKey.ONE, FlxKey.LEFT]);
+				inline bindKeys(Control.RIGHT, [FlxKey.SIX, FlxKey.RIGHT]);
+				inline bindKeys(Control.ACCEPT, [Z, SPACE, ENTER]);
+				inline bindKeys(Control.BACK, [BACKSPACE, ESCAPE]);
+				inline bindKeys(Control.PAUSE, [P, ENTER, ESCAPE]);
+				inline bindKeys(Control.RESET, [R]);
 			case None: // nothing
 			case Custom: // nothing
 		}

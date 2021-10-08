@@ -1,5 +1,6 @@
 package;
 
+import cpp.Function;
 import Conductor.BPMChangeEvent;
 import Section.SwagSection;
 import Song.SwagSong;
@@ -37,6 +38,10 @@ using StringTools;
 class ChartingState extends MusicBeatState
 {
 	var _file:FileReference;
+
+	var noteType:Int;
+	var noteTypeText:FlxText;
+	var noteTypeList:Array<String> = ['normal', 'light'];
 
 	var UI_box:FlxUITabMenu;
 
@@ -168,6 +173,10 @@ class ChartingState extends MusicBeatState
 
 		add(curRenderedNotes);
 		add(curRenderedSustains);
+
+		noteTypeText = new FlxText(20, 20, 800, '', 24);
+		noteTypeText.scrollFactor.set();
+		add(noteTypeText);
 
 		super.create();
 	}
@@ -334,11 +343,27 @@ class ChartingState extends MusicBeatState
 		stepperSusLength.name = 'note_susLength';
 
 		var applyLength:FlxButton = new FlxButton(100, 10, 'Apply');
+		var incr:FlxButton = new FlxButton(10, 60, 'NextType', () -> {
+			noteType++;
+		});
+		var decr:FlxButton = new FlxButton(incr.x + 100, incr.y, 'PrevType', () -> {
+			noteType--;
+		});
 
 		tab_group_note.add(stepperSusLength);
 		tab_group_note.add(applyLength);
+		tab_group_note.add(incr);
+		tab_group_note.add(decr);
 
 		UI_box.addGroup(tab_group_note);
+	}
+
+	function safeIndex() {
+		if (noteType > noteTypeList.length - 1) {
+			noteType = 0;
+		} else if (noteType < 0) {
+			noteType = noteTypeList.length - 1;
+		}
 	}
 
 	function loadSong(daSong:String):Void
@@ -589,6 +614,12 @@ class ChartingState extends MusicBeatState
 				}
 			}
 
+			if (FlxG.keys.justPressed.I) {
+				noteType--;
+			} else if (FlxG.keys.justPressed.O) {
+				noteType++;
+			}
+
 			if (FlxG.keys.justPressed.R)
 			{
 				if (FlxG.keys.pressed.SHIFT)
@@ -666,7 +697,11 @@ class ChartingState extends MusicBeatState
 			+ Std.string(FlxMath.roundDecimal(FlxG.sound.music.length / 1000, 2))
 			+ "\nSection: "
 			+ curSection;
-		super.update(elapsed);
+		
+			safeIndex();
+			noteTypeText.text = 'placing ${noteTypeList[noteType]} notes\n\nPress I to go to prev. note type\nPress O to go to next note type';
+		
+			super.update(elapsed);
 	}
 
 	function changeNoteSustain(value:Float):Void
