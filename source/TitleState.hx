@@ -382,9 +382,9 @@ class TitleState extends MusicBeatState
 			case 13:
 				addMoreText('Friday Night Funkin');
 			case 14:
-				addMoreText('crystal');
+				addMoreText('stuck in a snowglobe');
 			case 15:
-				addMoreText('snowglobe');
+				addMoreText('insert frost effect here');
 			case 16:
 				skipIntro();
 		}
