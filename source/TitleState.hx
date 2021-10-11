@@ -115,6 +115,8 @@ class TitleState extends MusicBeatState
 	var danceLeft:Bool = false;
 	var titleText:FlxSprite;
 
+	var startCountin:Bool = false;
+
 	function startIntro()
 	{
 		if (!initialized)
@@ -140,8 +142,9 @@ class TitleState extends MusicBeatState
 			// FlxG.sound.list.add(music);
 			// music.play();
 			FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
-
+			Globals.currentSong = 'freakyMenu'; 
 			FlxG.sound.music.fadeIn(4, 0, 0.7);
+			startCountin = true;
 		}
 
 		Conductor.changeBPM(102);
@@ -296,6 +299,10 @@ class TitleState extends MusicBeatState
 		{
 			skipIntro();
 		}
+
+		
+		if (startCountin)
+			Globals.menuSongTime = FlxG.sound.music.time;
 
 		super.update(elapsed);
 	}

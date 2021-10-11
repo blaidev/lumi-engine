@@ -78,8 +78,10 @@ class StoryMenuState extends MusicBeatState
 
 		if (FlxG.sound.music != null)
 		{
-			if (!FlxG.sound.music.playing)
+			if (!FlxG.sound.music.playing) {
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
+				Globals.currentSong = 'freakyMenu';
+			}
 		}
 
 		persistentUpdate = persistentDraw = true;
@@ -284,6 +286,8 @@ class StoryMenuState extends MusicBeatState
 			FlxG.switchState(new MainMenuState());
 		}
 
+		Globals.menuSongTime = FlxG.sound.music.time;
+
 		super.update(elapsed);
 	}
 
@@ -433,6 +437,7 @@ class StoryMenuState extends MusicBeatState
 		{
 			txtTracklist.text += "\n" + i;
 		}
+		txtTracklist.text += '\n';
 
 		txtTracklist.text = txtTracklist.text.toUpperCase();
 

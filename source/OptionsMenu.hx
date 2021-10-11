@@ -31,18 +31,32 @@ class OptionsMenu extends MusicBeatState
 	}
 
 	public override function create() {
+
+		if (Globals.currentSong != 'freakyMenu') {
+			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+		} else if (Globals.currentSong == 'freakyMenu' && !FlxG.sound.music.playing) {
+			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			FlxG.sound.music.time = Globals.menuSongTime;
+		}
+
 		var balls = new FlxSprite(0, 0).loadGraphic(Paths.image('menuDesat', 'preload'));
 		balls.color = 0xFF228B22;
 		add(balls);
 		buttons = new FlxTypedGroup<FlxButtonPlus>();
 		add(buttons);
 		createOptions(170, 0, 4);
+		for (i in buttons.members) {
+			i.onColor = [FlxColor.GREEN];
+			i.offColor = [FlxColor.RED];
+		}
 		super.create();
 	}
 
 	public override function update(elapsed:Float) {
 		dumbRender();
 		super.update(elapsed);
+
+		Globals.menuSongTime = FlxG.sound.music.time;
 
 		if (controls.BACK || controls.ACCEPT) {
 			FlxG.save.flush();

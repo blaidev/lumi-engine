@@ -153,6 +153,8 @@ class FreeplayState extends MusicBeatState
 			trace(md);
 		 */
 
+		 FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
+
 		super.create();
 	}
 
@@ -277,6 +279,7 @@ class FreeplayState extends MusicBeatState
 
 		#if PRELOAD_ALL
 		FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
+		Globals.currentSong = songs[curSelected].songName;
 		#end
 
 		var bullShit:Int = 0;

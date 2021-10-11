@@ -53,6 +53,9 @@ class PlayState extends MusicBeatState
 	public static var storyPlaylist:Array<String> = [];
 	public static var storyDifficulty:Int = 1;
 
+	public static var currentBeat:Int;
+	public static var currentStep:Int;
+
 	var halloweenLevel:Bool = false;
 
 	private var vocals:FlxSound;
@@ -1034,8 +1037,10 @@ class PlayState extends MusicBeatState
 		previousFrameTime = FlxG.game.ticks;
 		lastReportedPlayheadPosition = 0;
 
-		if (!paused)
+		if (!paused) {
 			FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
+			Globals.currentSong = PlayState.SONG.song;
+		}
 		FlxG.sound.music.onComplete = endSong;
 		vocals.play();
 
@@ -2497,6 +2502,9 @@ class PlayState extends MusicBeatState
 	override function stepHit()
 	{
 		super.stepHit();
+
+		currentStep = curStep;
+
 		if (FlxG.sound.music.time > Conductor.songPosition + 20 || FlxG.sound.music.time < Conductor.songPosition - 20)
 		{
 			resyncVocals();
@@ -2514,6 +2522,8 @@ class PlayState extends MusicBeatState
 	override function beatHit()
 	{
 		super.beatHit();
+
+		currentBeat = curBeat;
 
 		if (generatedMusic)
 		{

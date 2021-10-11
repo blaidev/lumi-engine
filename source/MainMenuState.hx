@@ -45,10 +45,13 @@ class MainMenuState extends MusicBeatState
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
 
-		if (!FlxG.sound.music.playing)
+		if (!FlxG.sound.music.playing || Globals.currentSong != 'freakyMenu')
 		{
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			Globals.currentSong = 'freakyMenu'; 
+			FlxG.sound.music.time = Globals.menuSongTime;
 		}
+		
 
 		persistentUpdate = persistentDraw = true;
 
@@ -201,7 +204,11 @@ class MainMenuState extends MusicBeatState
 			}
 		}
 
+		Globals.menuSongTime = FlxG.sound.music.time;
+
 		super.update(elapsed);
+
+		Globals.menuSongTime = FlxG.sound.music.time;
 
 		menuItems.forEach(function(spr:FlxSprite)
 		{
