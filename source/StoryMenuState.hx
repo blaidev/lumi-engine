@@ -169,7 +169,12 @@ class StoryMenuState extends MusicBeatState
 				case 'parents-christmas':
 					weekCharacterThing.setGraphicSize(Std.int(weekCharacterThing.width * 0.9));
 					weekCharacterThing.updateHitbox();
-			}
+				default:
+					weekCharacterThing.setGraphicSize(Std.int(weekCharacterThing.width * 0.5));
+					weekCharacterThing.updateHitbox();
+					FlxG.log.warn('This week does not have a character! Using dad as placeholder.');
+					trace('This week does not have a character! Using dad as placeholder.');
+				}
 
 			grpWeekCharacters.add(weekCharacterThing);
 		}
@@ -402,7 +407,12 @@ class StoryMenuState extends MusicBeatState
 
 	function updateText()
 	{
-		grpWeekCharacters.members[0].animation.play(weekCharacters[curWeek][0]);
+		switch (weekCharacters[curWeek][0]) {
+			case 'dad' | 'pico' | 'mom' | 'spooky' | 'senpai' | 'parents-christmas':
+			grpWeekCharacters.members[0].animation.play(weekCharacters[curWeek][0]);
+			default:
+				grpWeekCharacters.members[0].animation.play('dad');
+		}
 		grpWeekCharacters.members[1].animation.play(weekCharacters[curWeek][1]);
 		grpWeekCharacters.members[2].animation.play(weekCharacters[curWeek][2]);
 		txtTracklist.text = "Tracks\n";
@@ -426,7 +436,7 @@ class StoryMenuState extends MusicBeatState
 				grpWeekCharacters.members[0].setGraphicSize(Std.int(grpWeekCharacters.members[0].width * 1));
 
 			default:
-				grpWeekCharacters.members[0].offset.set(100, 100);
+				grpWeekCharacters.members[0].offset.set(120, 200);
 				grpWeekCharacters.members[0].setGraphicSize(Std.int(grpWeekCharacters.members[0].width * 1));
 				// grpWeekCharacters.members[0].updateHitbox();
 		}

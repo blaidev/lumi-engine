@@ -368,9 +368,9 @@ class TitleState extends MusicBeatState
 			// credTextShit.text = 'In association \nwith';
 			// credTextShit.screenCenter();
 			case 5:
-				createCoolText(['made with']);
+				createCoolText(['an engine']);
 			case 7:
-				addMoreText('haze engine');
+				addMoreText('for FNF');
 			// credTextShit.text += '\nNewgrounds';
 			case 8:
 				deleteCoolText();
@@ -393,9 +393,9 @@ class TitleState extends MusicBeatState
 			case 13:
 				addMoreText('Friday Night Funkin');
 			case 14:
-				addMoreText('stuck in a snowglobe');
+				addMoreText('Haze');
 			case 15:
-				addMoreText('insert frost effect here');
+				addMoreText('Engine');
 			case 16:
 				skipIntro();
 		}
