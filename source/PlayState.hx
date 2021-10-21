@@ -1,5 +1,8 @@
 package;
 
+import BetterRating.Ratings;
+import BetterRating.Etterna;
+import flixel.system.FlxAssets.FlxShader;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -1921,7 +1924,7 @@ class PlayState extends MusicBeatState
 	private function popUpScore(strumtime:Float, note:Note):Void
 	{
 		var noteDiff:Float = Math.abs(strumtime - Conductor.songPosition);
-		// boyfriend.playAnim('hey');
+		var wife = Etterna.wife3(-noteDiff, Conductor.timeScale);
 		vocals.volume = 1;
 
 		var placement:String = Std.string(combo);
@@ -1934,7 +1937,7 @@ class PlayState extends MusicBeatState
 		var rating:FlxSprite = new FlxSprite();
 		var score:Int = 350;
 
-		var daRating:String = "sick";
+		var daRating:String = Ratings.judgeNote(note);
 
 		if (noteDiff > Conductor.safeZoneOffset * 0.9)
 		{
@@ -2657,6 +2660,9 @@ class PlayState extends MusicBeatState
 		}
 
 		function createNoteSplash(note:Note) {
+			
+			//TODO: fix note splash positions
+
 			var pref:String = '';
 			var altStr:String = '';
 
@@ -2683,4 +2689,26 @@ class PlayState extends MusicBeatState
 			noteSplashes.add(splash);
 			
 		}
+
+		// premade note function shit lmao
+
+	function damageNote(val:Float, ?safety:Float) {
+		if (safety != null) {
+			if (health > safety)
+				health -= val;
+		}
+	}
+
+	function healNote(val:Float) {
+		health += val;
+	}
+
+	function shaderNote(daNote:Note, shader:FlxShader)
+		daNote.shader = shader;
+
+	function shaderBfNote(shader:FlxShader)
+		boyfriend.shader = shader;
+	
+	function shaderDadNote(shader:FlxShader)
+		dad.shader = shader;
 }

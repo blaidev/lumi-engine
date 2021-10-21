@@ -34,7 +34,7 @@ class NoteSplash extends FlxSprite {
 
     function setupShit() {
         setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
-        offset.set(10, 10);
+       offset.set(10, 10);
     }
 
     public function addAnims() {

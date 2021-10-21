@@ -14,6 +14,9 @@ using StringTools;
 
 class DialogueBox extends FlxSpriteGroup
 {
+
+	var cpuStrums:Int;
+
 	var box:FlxSprite;
 
 	var curCharacter:String = '';
@@ -61,7 +64,7 @@ class DialogueBox extends FlxSpriteGroup
 		}, 5);
 
 		box = new FlxSprite(-20, 45);
-		
+
 		var hasDialog = false;
 		switch (PlayState.SONG.song.toLowerCase())
 		{
