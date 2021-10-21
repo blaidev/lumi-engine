@@ -98,7 +98,7 @@ class PlayState extends MusicBeatState
 	private var camHUD:FlxCamera;
 	private var camGame:FlxCamera;
 
-	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
+	var dialogue:Array<String> = [];
 
 	var halloweenBG:FlxSprite;
 	var isHalloween:Bool = false;
@@ -149,6 +149,8 @@ class PlayState extends MusicBeatState
 	var mashTimerA:Float = 0;
 	var mashTimeA:Float = 2.0;
 
+	var dialogueExists:Bool = true;
+
 	override public function create()
 	{
 		if (FlxG.sound.music != null)
@@ -172,34 +174,14 @@ class PlayState extends MusicBeatState
 
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
-
-		switch (SONG.song.toLowerCase())
-		{
-			case 'tutorial':
-				dialogue = ["Hey you're pretty cute.", 'Use the arrow keys to keep up \nwith me singing.'];
-			case 'bopeebo':
-				dialogue = [
-					'HEY!',
-					"You think you can just sing\nwith my daughter like that?",
-					"If you want to date her...",
-					"You're going to have to go \nthrough ME first!"
-				];
-			case 'fresh':
-				dialogue = ["Not too shabby boy.", ""];
-			case 'dadbattle':
-				dialogue = [
-					"gah you think you're hot stuff?",
-					"If you can beat me here...",
-					"Only then I will even CONSIDER letting you\ndate my daughter!"
-				];
-			case 'senpai':
-				dialogue = CoolUtil.coolTextFile(Paths.txt('senpai/senpaiDialogue'));
-			case 'roses':
-				dialogue = CoolUtil.coolTextFile(Paths.txt('roses/rosesDialogue'));
-			case 'thorns':
-				dialogue = CoolUtil.coolTextFile(Paths.txt('thorns/thornsDialogue'));
+		
+		try {
+			dialogue = CoolUtil.coolTextFile(Paths.txt('${SONG.song.toLowerCase()}/${SONG.song.toLowerCase()}Dialogue'));
+			dialogueExists = true;
+		} catch (e) { 
+			trace('couldnt find dialogue file, error: ${e}');
+			dialogueExists = false;
 		}
-
 		#if desktop
 		// Making difficulty text for Discord Rich Presence.
 		switch (storyDifficulty)
@@ -785,6 +767,24 @@ class PlayState extends MusicBeatState
 
 		if (isStoryMode)
 		{
+
+			// if (dialogue == ['blah blah blah', 'coolswag'] || dialogue == []) {
+			// 	startCountdown();
+			// } else {
+			// 	try {
+			// 		schoolIntro(doof);
+			// 	} catch (e) {
+			// 		trace('could find dialogue, sorry lmfao', '\n error shit: $e');
+			// 		startCountdown();
+			// 	}
+			// }
+
+			if (dialogueExists) {
+				schoolIntro(doof);
+			} else {
+				startCountdown();
+			}
+
 			switch (curSong.toLowerCase())
 			{
 				case "winter-horrorland":
@@ -815,15 +815,20 @@ class PlayState extends MusicBeatState
 							});
 						});
 					});
-				case 'senpai':
-					schoolIntro(doof);
-				case 'roses':
-					FlxG.sound.play(Paths.sound('ANGRY'));
-					schoolIntro(doof);
-				case 'thorns':
-					schoolIntro(doof);
-				default:
-					startCountdown();
+
+
+
+				// case 'senpai':
+				// 	schoolIntro(doof);
+				// case 'roses':
+				// 	FlxG.sound.play(Paths.sound('ANGRY'));
+				// 	schoolIntro(doof);
+				// case 'thorns':
+				// 	schoolIntro(doof);
+				// case 'tutorial':
+				// 	schoolIntro(doof);
+				// default:
+				// 	startCountdown();
 			}
 		}
 		else
