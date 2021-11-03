@@ -1,6 +1,5 @@
 package;
 
-import OptionsMenu.OptionFunctions;
 #if desktop
 import Discord.DiscordClient;
 import sys.thread.Thread;
@@ -55,11 +54,14 @@ class TitleState extends MusicBeatState
 
 		if (FlxG.save.data.dfjk)
 			controls.setKeyboardScheme(DFJK);
-		else if (FlxG.save.data.cursed)
-			controls.setKeyboardScheme(Cursed);
 		else
 			controls.setKeyboardScheme(Solo);
 		
+
+		trace(FlxG.save.data.skip);
+
+		if (FlxG.save.data.skip)
+			FlxG.switchState(new MainMenuState());
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
@@ -356,10 +358,10 @@ class TitleState extends MusicBeatState
 		switch (curBeat)
 		{
 			case 1:
-				createCoolText(['a hazy winter']);
+				createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
 			// credTextShit.visible = true;
 			case 3:
-				addMoreText('presents');
+				addMoreText('present');
 			// credTextShit.text += '\npresent...';
 			// credTextShit.addText();
 			case 4:
@@ -368,9 +370,10 @@ class TitleState extends MusicBeatState
 			// credTextShit.text = 'In association \nwith';
 			// credTextShit.screenCenter();
 			case 5:
-				createCoolText(['an engine']);
+				createCoolText(['made with']);
 			case 7:
-				addMoreText('for FNF');
+				addMoreText('lumi engine');
+				ngSpr.visible = true;
 			// credTextShit.text += '\nNewgrounds';
 			case 8:
 				deleteCoolText();
@@ -391,11 +394,14 @@ class TitleState extends MusicBeatState
 			// credTextShit.text = "Friday";
 			// credTextShit.screenCenter();
 			case 13:
-				addMoreText('Friday Night Funkin');
+				addMoreText('Friday');
+			// credTextShit.visible = true;
 			case 14:
-				addMoreText('Haze');
+				addMoreText('Night');
+			// credTextShit.text += '\nNight';
 			case 15:
-				addMoreText('Engine');
+				addMoreText('Funkin'); // credTextShit.text += '\nFunkin';
+
 			case 16:
 				skipIntro();
 		}

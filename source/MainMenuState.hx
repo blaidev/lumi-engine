@@ -1,5 +1,7 @@
 package;
 
+import flixel.addons.effects.FlxTrail;
+import flixel.util.FlxTimer;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -22,6 +24,7 @@ using StringTools;
 class MainMenuState extends MusicBeatState
 {
 	var curSelected:Int = 0;
+	var curSelectedSmooth:Float = 0;
 
 	var menuItems:FlxTypedGroup<FlxSprite>;
 
@@ -55,7 +58,7 @@ class MainMenuState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
-		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
+		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
 		bg.scrollFactor.x = 0;
 		bg.scrollFactor.y = 0.18;
 		bg.setGraphicSize(Std.int(bg.width * 1.1));
@@ -86,17 +89,18 @@ class MainMenuState extends MusicBeatState
 
 		for (i in 0...optionShit.length)
 		{
-			var menuItem:FlxSprite = new FlxSprite(0, 60 + (i * 160));
+			var menuItem:FlxSprite = new FlxSprite((i * 160) + 60, 60 + (i * 160));
 			menuItem.frames = tex;
 			menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
 			menuItem.animation.play('idle');
 			menuItem.ID = i;
-			menuItem.screenCenter(X);
 			menuItems.add(menuItem);
 			menuItem.scrollFactor.set();
 			menuItem.antialiasing = true;
 		}
+
+		bg.scale.set(1.13, 1.13);
 
 		FlxG.camera.follow(camFollow, null, 0.06);
 
@@ -123,6 +127,7 @@ class MainMenuState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+
 		if (FlxG.sound.music.volume < 0.8)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
@@ -149,6 +154,9 @@ class MainMenuState extends MusicBeatState
 
 			if (controls.ACCEPT)
 			{
+
+				
+
 				if (optionShit[curSelected] == 'donate')
 				{
 					#if linux
@@ -162,24 +170,24 @@ class MainMenuState extends MusicBeatState
 					selectedSomethin = true;
 					FlxG.sound.play(Paths.sound('confirmMenu'));
 
-					FlxFlicker.flicker(magenta, 1.1, 0.15, false);
-
 					menuItems.forEach(function(spr:FlxSprite)
 					{
 						if (curSelected != spr.ID)
 						{
-							FlxTween.tween(spr, {alpha: 0}, 0.4, {
-								ease: FlxEase.quadOut,
-								onComplete: function(twn:FlxTween)
-								{
-									spr.kill();
-								}
-							});
+							FlxTween.tween(spr, {x: FlxG.width * 1}, 1, {ease: FlxEase.backInOut, onComplete: _ -> {
+								spr.kill();
+							}});
 						}
 						else
 						{
-							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
-							{
+							new FlxTimer().start(.65, _ -> {
+							FlxTween.tween(menuItems.members[curSelected], {x: FlxG.width / 2 - menuItems.members[curSelected].width / 2}, .5,{ease: FlxEase.backIn, onComplete: _ -> {
+								FlxTween.tween(menuItems.members[curSelected], {y: FlxG.height / 2 - menuItems.members[curSelected].height / 2}, .5, {ease: FlxEase.backIn, onComplete: _ -> {
+									
+								}});
+							}});
+						});
+							new FlxTimer().start(1.8, _ -> {
 								var daChoice:String = optionShit[curSelected];
 
 								switch (daChoice)
@@ -210,9 +218,11 @@ class MainMenuState extends MusicBeatState
 
 		Globals.menuSongTime = FlxG.sound.music.time;
 
+
+	
+		
 		menuItems.forEach(function(spr:FlxSprite)
 		{
-			spr.screenCenter(X);
 		});
 	}
 
@@ -225,6 +235,8 @@ class MainMenuState extends MusicBeatState
 		if (curSelected < 0)
 			curSelected = menuItems.length - 1;
 
+		FlxTween.num(curSelectedSmooth, curSelected, .06);
+
 		menuItems.forEach(function(spr:FlxSprite)
 		{
 			spr.animation.play('idle');
@@ -232,9 +244,12 @@ class MainMenuState extends MusicBeatState
 			if (spr.ID == curSelected)
 			{
 				spr.animation.play('selected');
+				
+				// FlxTween.tween(camFollow, {x: spr.getGraphicMidpoint().x, y: spr.getGraphicMidpoint().y}, .04);
 				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y);
 			}
 
+			
 			spr.updateHitbox();
 		});
 	}

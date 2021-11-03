@@ -15,157 +15,128 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import lime.utils.Assets;
 
-class OptionsMenu extends MusicBeatState
-{
-	public var buttons:FlxTypedGroup<FlxButtonPlus>;
-	public static var callbacks:Array<Void->Dynamic> = [];
-	public static var buttonStrings:Array<String> = [];
+class OptionsMenu extends MusicBeatState {
+	private var buttons:FlxTypedGroup<FlxButtonPlus>;
+	private static var callbacks:Array<Bool->String> = [];
+	private static var buttonNames:Array<String> = ['dfjk', 'down', 'ghost', 'splash'];
+	
+	var bg:FlxSprite;
+
+	var saveMap:Map<String, Dynamic>;
 
 	public function new() {
-
-		FlxG.save.bind('funkin', "ninjamuffin99");
-		//OptionFunctions.reset();
 		super();
 		FlxG.mouse.visible = true;
-		OptionFunctions.addFunctionsToList();
-	}
+		FlxG.mouse.enabled = true;
+		callbacks = [DFJK, downScroll, ghostTapping, noteSplash];
 
-	public override function create() {
 
-		if (Globals.currentSong != 'freakyMenu') {
-			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-		} else if (Globals.currentSong == 'freakyMenu' && !FlxG.sound.music.playing) {
-			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-			FlxG.sound.music.time = Globals.menuSongTime;
-		}
-
-		var balls = new FlxSprite(0, 0).loadGraphic(Paths.image('menuDesat', 'preload'));
-		balls.color = 0xFF228B22;
-		add(balls);
 		buttons = new FlxTypedGroup<FlxButtonPlus>();
+
+		saveMap = [
+			"dfjk" => FlxG.save.data.dfjk,
+			"downscroll" => FlxG.save.data.downscroll,
+			"ghost tapping" => FlxG.save.data.ghost,
+			"note splashes" => FlxG.save.data.notesplash
+		];
+
+		bg = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
+		bg.color = FlxColor.GREEN;
+		add(bg);
 		add(buttons);
-		createOptions(170, 0, 4);
-		for (i in buttons.members) {
-			i.onColor = [FlxColor.GREEN];
-			i.offColor = [FlxColor.RED];
+
+		for (i in 0...callbacks.length) {
+			if (buttonNames[i] == 'dfjk')
+				buttons.add(new FlxButtonPlus(40, (i * 80) + 60, () -> {
+				DFJK(true);
+				buttons.members[0].text = DFJK(false);
+				saveMap.set("dfjk", FlxG.save.data.dfjk);
+			}, 'lol', 200, 50));
+			if (buttonNames[i] == 'down')
+				buttons.add(new FlxButtonPlus(40, (i * 80) + 60, () -> {
+				downScroll(true);
+				buttons.members[1].text = downScroll(false);
+				saveMap.set("notesplash", FlxG.save.data.notesplash);
+			}, 'lol', 200, 50));
+			if (buttonNames[i] == 'ghost')
+				buttons.add(new FlxButtonPlus(40, (i * 80) + 60, () -> {
+				ghostTapping(true);
+				buttons.members[2].text = ghostTapping(false);
+				saveMap.set("ghost tapping", FlxG.save.data.ghost);
+			}, 'lol', 200, 50));
+			if (buttonNames[i] == 'splash')
+				buttons.add(new FlxButtonPlus(40, (i * 80) + 60, () -> {
+				noteSplash(true);
+				buttons.members[3].text = noteSplash(false);
+				saveMap.set("notesplash", FlxG.save.data.notesplash);
+			}, 'lol', 200, 50));
 		}
-		super.create();
+
+		buttons.members[0].text = DFJK(false);
+		buttons.members[1].text = downScroll(false);
+		buttons.members[2].text = ghostTapping(false);
+		buttons.members[3].text = noteSplash(false);
+
+		var bruh = ["dfjk", "downscroll", "ghost tapping", "note splashes"];
 	}
 
 	public override function update(elapsed:Float) {
-		dumbRender();
 		super.update(elapsed);
-
 		Globals.menuSongTime = FlxG.sound.music.time;
 
 		if (controls.BACK || controls.ACCEPT) {
-			FlxG.save.flush();
+			trace(saveMap);
+			save();
 			FlxG.switchState(new MainMenuState());
 		}
 	}
 
-	function createOptions(x:Float, ?startWhere:Int = 0, ?endWhere:Int = 5) {
-		
-		var theBaby:Int = 0;
-
-		for (i in 0...buttonStrings.length) {
-			var button = new FlxButtonPlus(x, 0, callbacks[i], buttonStrings[i], 125, 65);
-			button.y = ((button.y + 80) * i) + 45;
-			theBaby++;
-			button.onClickCallback = callbacks[i]; // just make sure
-			buttons.add(button);
-		}
+	function DFJK(?saving:Bool=true) {
+		if (saving)
+			FlxG.save.data.dfjk = !FlxG.save.data.dfjk;
+		save();
+		return FlxG.save.data.dfjk ? "DFJK On" : "DFJK Off";
 	}
 
-	function dfjkString() {
-		return FlxG.save.data.dfjk ? "DFJK Keybinds\nOn" : "DFJK Keybinds\nOff";
+	function downScroll(?saving:Bool=true) {
+		if (saving)
+			FlxG.save.data.downscroll = !FlxG.save.data.downscroll;
+		save();
+		return FlxG.save.data.downscroll ? "Downscroll On" : "Downscroll Off";
 	}
 
-	function ghostString() {
-		return FlxG.save.data.ghost ? "Ghost Tapping\nOn" : "Ghost Tapping\nOff";
+	function ghostTapping(?saving:Bool=true) {
+		if (saving)
+			FlxG.save.data.ghost = !FlxG.save.data.ghost;
+		save();
+		return FlxG.save.data.ghost ? "Ghost Tapping On" : "Ghost Tapping Off";
 	}
 
-	function noteString() {
-		return FlxG.save.data.notesplash ? "Note Splashes\nOn" : "Note Splashes\nOff";
+	function noteSplash(?saving:Bool=true) {
+		if (saving)
+			FlxG.save.data.notesplash = !FlxG.save.data.notesplash;
+		save();
+		return FlxG.save.data.notesplash ? "Note Splashes On" : "Note Splashes Off";
 	}
 
-	function cursedString() {
-		return FlxG.save.data.cursed ? "1356\nOn" : "1356\nOff"; 
-	}
-
-	function downscrollString() {
-		return FlxG.save.data.downscroll ? "Downscroll\nOn" : "Downscroll\nOff";
-	}
-
-	public function dumbRender() {
-		var bs = buttons.members;
-		bs[0].text = dfjkString();
-		bs[1].text = downscrollString();
-		bs[2].text = ghostString();
-		bs[3].text = noteString();
-		bs[4].text = cursedString();
+	function save() {
+		FlxG.save.flush();
 	}
 }
 
-class OptionFunctions {
-	
-	public static var callbacksArray:Array<Void->Dynamic> = [];
+class OptionButton extends FlxButtonPlus {
 
-	public static function addFunctionsToList() {
-		pushStuff();
-		for (i in callbacksArray) {
-			OptionsMenu.callbacks.push(i);
-		}
-		OptionsMenu.buttonStrings = ['DFJK', 'Downscroll', 'Ghost Tapping', 'Note Splashes', '1356'];
-	}
-	
-	public static function setDFJK():String {
-		FlxG.save.data.dfjk = !FlxG.save.data.dfjk;
-		FlxG.save.data.cursed = false;
-		FlxG.save.flush();
-		return FlxG.save.data.dfjk ? "DFJK Keybinds\nOn" : "DFJK Keybinds\nOff";
+	private var callback:Bool->String;
+
+	public function new(x:Float, y:Float, text:String, width:Float, height:Float, callback:Bool->String) {
+		super(x, y, text);
+		this.width = width;
+		this.height = height;
+		this.callback = callback;
+		updateHitbox();
 	}
 
-	public static function setGhostTapping():String {
-		FlxG.save.data.ghost = !FlxG.save.data.ghost;
-		FlxG.save.flush();
-		return FlxG.save.data.ghost ? "Ghost Tapping\nOn" : "Ghost Tapping\nOff";
-	}
-
-	public static function setNoteSplashes():String {
-		FlxG.save.data.notesplash = !FlxG.save.data.notesplash;
-		FlxG.save.flush();
-		return FlxG.save.data.notesplash ? "Note Splashes\nOn" : "Note Splashes\nOff";
-	}
-
-	public static function set1356() {
-		FlxG.save.data.cursed = !FlxG.save.data.cursed;
-		FlxG.save.data.dfjk = false;
-		FlxG.save.flush();
-		return FlxG.save.data.notesplash ? "1356\nOn" : "1356\nOff";
-	}
-
-	public static function setDownscroll() {
-		FlxG.save.data.downscroll = !FlxG.save.data.downscroll;
-		FlxG.save.flush();
-		return FlxG.save.data.downscroll ? "Downscroll On\n" : "Downscroll\nOff";
-	}
-
-	static function pushStuff() {
-		callbacksArray.push(setDFJK);
-		callbacksArray.push(setDownscroll);
-		callbacksArray.push(setGhostTapping);
-		callbacksArray.push(setNoteSplashes);
-		callbacksArray.push(set1356);
-	}
-
-	public static function reset() {
-		// shit be4 release lmao
-		FlxG.save.data.dfjk = false;
-		FlxG.save.data.ghost = true; // idk
-		FlxG.save.data.notesplash = true;
-		FlxG.save.data.cursed = false;
-		FlxG.save.data.downscroll = false;
-		FlxG.save.flush();
+	function call(?saving:Bool) {
+		callback(saving);
 	}
 }

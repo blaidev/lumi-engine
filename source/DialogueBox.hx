@@ -1,5 +1,6 @@
 package;
 
+import lime.utils.Assets;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.text.FlxTypeText;
@@ -11,6 +12,27 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
 using StringTools;
+
+class DialogueCharacter extends FlxSprite{
+	
+	var character:String;
+	
+	public function new(character:String) {
+		super();
+		this.character = character;
+	}
+
+	function loadShit() {
+		switch (character) {
+			case 'bf':
+			frames = Paths.getSparrowAtlas('weeb/bfPortrait');
+			animation.addByPrefix('enter', "Boyfriend portrait enter", 24, false);
+			case 'dad':
+				frames = Paths.getSparrowAtlas('weeb/senpaiPortrait');
+				animation.addByPrefix('enter', "Senpai Portrait Enter", 24, false);
+		}
+	}
+}
 
 class DialogueBox extends FlxSpriteGroup
 {
@@ -285,3 +307,4 @@ class DialogueBox extends FlxSpriteGroup
 		dialogueList[0] = dialogueList[0].substr(splitName[1].length + 2).trim();
 	}
 }
+
