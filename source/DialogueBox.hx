@@ -1,5 +1,6 @@
 package;
 
+import flixel.tweens.FlxTween;
 import lime.utils.Assets;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -10,40 +11,23 @@ import flixel.input.FlxKeyManager;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
+import Xml;
 
 using StringTools;
 
-class DialogueCharacter extends FlxSprite{
-	
-	var character:String;
-	
-	public function new(character:String) {
-		super();
-		this.character = character;
-	}
-
-	function loadShit() {
-		switch (character) {
-			case 'bf':
-			frames = Paths.getSparrowAtlas('weeb/bfPortrait');
-			animation.addByPrefix('enter', "Boyfriend portrait enter", 24, false);
-			case 'dad':
-				frames = Paths.getSparrowAtlas('weeb/senpaiPortrait');
-				animation.addByPrefix('enter', "Senpai Portrait Enter", 24, false);
-		}
-	}
-}
-
 class DialogueBox extends FlxSpriteGroup
 {
-
-	var cpuStrums:Int;
 
 	var box:FlxSprite;
 
 	var curCharacter:String = '';
 
+	var xmlData:Xml;
+
 	var dialogueList:Array<String> = [];
+	var characterList:Array<String> = [];
+
+	var ind:Int = 0;
 
 	// SECOND DIALOGUE FOR THE PIXEL SHIT INSTEAD???
 	var swagDialogue:FlxTypeText;
@@ -58,9 +42,31 @@ class DialogueBox extends FlxSpriteGroup
 	var handSelect:FlxSprite;
 	var bgFade:FlxSprite;
 
-	public function new(talkingRight:Bool = true, ?dialogueList:Array<String>)
+	function readXml() {
+
+	}
+
+	public function new(talkingRight:Bool = true, ?_xmlData:Xml)
 	{
 		super();
+
+		xmlData = Xml.parse(_xmlData.toString());
+
+		try {
+		for (i in xmlData.firstElement().elements()) {
+			trace(i.nodeName + '\n');
+
+
+				if (i.nodeName == 'DialogueText') {
+				dialogueList.push(i.get("text"));
+				trace(i.get("text"));
+				characterList.push(i.get("character"));
+				trace(i);
+				}
+		}
+	} catch (e) {
+		trace('stupid error', e);
+	}
 
 		switch (PlayState.SONG.song.toLowerCase())
 		{
@@ -119,15 +125,13 @@ class DialogueBox extends FlxSpriteGroup
 				box.y = FlxG.height * .52;
 				box.screenCenter(X);
 		}
-
-		this.dialogueList = dialogueList;
 		
 		if (!hasDialog)
 			return;
 		var s = PlayState.SONG.song.toLowerCase();
 		if (s == 'thorns' || s == 'roses' || s == 'senpai') {
 		portraitLeft = new FlxSprite(-20, 40);
-		portraitLeft.frames = Paths.getSparrowAtlas('weeb/senpaiPortrait');
+		portraitLeft.frames = Paths.getSparrowAtlas('weeb/senpaiPortrait', 'week6');
 		portraitLeft.animation.addByPrefix('enter', 'Senpai Portrait Enter', 24, false);
 		portraitLeft.setGraphicSize(Std.int(portraitLeft.width * PlayState.daPixelZoom * 0.9));
 		portraitLeft.updateHitbox();
@@ -136,21 +140,21 @@ class DialogueBox extends FlxSpriteGroup
 		portraitLeft.visible = false;
 
 		portraitRight = new FlxSprite(0, 40);
-		portraitRight.frames = Paths.getSparrowAtlas('weeb/bfPortrait');
+		portraitRight.frames = Paths.getSparrowAtlas('weeb/bfPortrait', 'week6');
 		portraitRight.animation.addByPrefix('enter', 'Boyfriend portrait enter', 24, false);
 		portraitRight.setGraphicSize(Std.int(portraitRight.width * PlayState.daPixelZoom * 0.9));
 		portraitRight.updateHitbox();
 		portraitRight.scrollFactor.set();
 		add(portraitRight);
 		portraitRight.visible = false;
-		}
-
+		} else {
 		portraitRight = new FlxSprite();
 		portraitLeft = new FlxSprite();
 		portraitLeft.visible = false;
 		portraitRight.visible = false;
 		add(portraitRight);
 		add(portraitLeft);
+		}
 		
 		box.animation.play('normalOpen');
 		var s:String = PlayState.SONG.song.toLowerCase();
@@ -226,9 +230,11 @@ class DialogueBox extends FlxSpriteGroup
 		if (FlxG.keys.justPressed.ANY  && dialogueStarted == true)
 		{
 				
+			ind++;
+
 			FlxG.sound.play(Paths.sound('clickText'), 0.8);
 
-			if (dialogueList[1] == null && dialogueList[0] != null)
+			if (ind == dialogueList.length)
 			{
 				if (!isEnding)
 				{
@@ -256,7 +262,6 @@ class DialogueBox extends FlxSpriteGroup
 			}
 			else
 			{
-				dialogueList.remove(dialogueList[0]);
 				startDialogue();
 			}
 		}
@@ -268,43 +273,41 @@ class DialogueBox extends FlxSpriteGroup
 
 	function startDialogue():Void
 	{
-		cleanDialog();
 		// var theDialog:Alphabet = new Alphabet(0, 70, dialogueList[0], false, true);
 		// dialogue = theDialog;
 		// add(theDialog);
 
 		// swagDialogue.text = ;
-		swagDialogue.resetText(dialogueList[0]);
+		swagDialogue.resetText(dialogueList[ind]);
 		swagDialogue.start(0.04, true);
+
+		curCharacter = characterList[ind];
 
 		switch (curCharacter)
 		{
 			case 'dad':
+				trace('isDad');
 				if (PlayState.SONG.song.toLowerCase() != 'tutorial') {
 				portraitRight.visible = false;
 					if (!portraitLeft.visible)
 					{
 						portraitLeft.visible = true;
 						portraitLeft.animation.play('enter');
+						trace(portraitRight.graphic == null);
 					}
 				}
 			case 'bf':
+				trace('isBf');
 				if (PlayState.SONG.song.toLowerCase() != 'tutorial') {
 					portraitLeft.visible = false;
 					if (!portraitRight.visible)
 					{
 						portraitRight.visible = true;
 						portraitRight.animation.play('enter');
+						trace(portraitRight.graphic == null);
 					}
 			}
 		}
-	}
-
-	function cleanDialog():Void
-	{
-		var splitName:Array<String> = dialogueList[0].split(":");
-		curCharacter = splitName[1];
-		dialogueList[0] = dialogueList[0].substr(splitName[1].length + 2).trim();
 	}
 }
 

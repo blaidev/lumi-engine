@@ -1,0 +1,5 @@
+<DialogueBox>
+    <DialogueText text="Ah, a new fair maiden has come in search of true love!" character="dad"/>
+    <DialogueText text="A serenade between gentlemen shall decide where her beautiful heart shall reside" character="dad"/>
+    <DialogueText text="Bee bo bop" character="bf"/>
+</DialogueBox>

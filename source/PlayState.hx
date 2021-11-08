@@ -1,5 +1,7 @@
 package;
 
+import modding.Mod;
+import lime.app.Event;
 import BetterRating.Ratings;
 import BetterRating.Etterna;
 import flixel.system.FlxAssets.FlxShader;
@@ -44,12 +46,15 @@ import lime.utils.Assets;
 import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
+import Note;
 
 using StringTools;
 
 class PlayState extends MusicBeatState
 {
 	public static var curStage:String = '';
+	public static var curLevel:String = '';
+	public static var curDifficulty:String = '';
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
 	public static var storyWeek:Int = 0;
@@ -65,7 +70,7 @@ class PlayState extends MusicBeatState
 
 	private var dad:Character;
 	private var gf:Character;
-	private var boyfriend:Boyfriend;
+	public static var boyfriend:Boyfriend;
 
 	private var notes:FlxTypedGroup<Note>;
 	private var unspawnNotes:Array<Note> = [];
@@ -98,7 +103,7 @@ class PlayState extends MusicBeatState
 	private var camHUD:FlxCamera;
 	private var camGame:FlxCamera;
 
-	var dialogue:Array<String> = [];
+	var dialogue:Xml;
 
 	var halloweenBG:FlxSprite;
 	var isHalloween:Bool = false;
@@ -153,6 +158,10 @@ class PlayState extends MusicBeatState
 
 	override public function create()
 	{
+
+		// ModData.funcs.push(bfReplace);
+		// ModData.funcs.push(dadReplace);
+
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
@@ -176,9 +185,12 @@ class PlayState extends MusicBeatState
 		Conductor.changeBPM(SONG.bpm);
 		
 		try {
-			dialogue = CoolUtil.coolTextFile(Paths.txt('${SONG.song.toLowerCase()}/${SONG.song.toLowerCase()}Dialogue'));
+			trace('${SONG.song.toLowerCase()}/${SONG.song.toLowerCase()}Dialogue');
+			dialogue = Paths.getXmlDialogue('${SONG.song.toLowerCase()}/${SONG.song.toLowerCase()}Dialogue', 'preload');
 			dialogueExists = true;
+			//trace(Paths.getXmlDialogue('senpai/senpaiXml', 'preload').firstElement());
 		} catch (e) { 
+			dialogue = Xml.createComment('empty');
 			trace('couldnt find dialogue file, error: ${e}');
 			dialogueExists = false;
 		}
@@ -674,7 +686,6 @@ class PlayState extends MusicBeatState
 
 		add(dad);
 		add(boyfriend);
-
 		var doof:DialogueBox = new DialogueBox(false, dialogue);
 		// doof.x += 70;
 		// doof.y = FlxG.height * 0.5;
@@ -1081,6 +1092,7 @@ class PlayState extends MusicBeatState
 
 		notes = new FlxTypedGroup<Note>();
 		add(notes);
+
 		add(noteSplashes);
 		var noteData:Array<SwagSection>;
 
@@ -1173,12 +1185,9 @@ class PlayState extends MusicBeatState
 			babyArrow.updateHitbox();
 			babyArrow.scrollFactor.set();
 
-			if (!isStoryMode)
-			{
-				babyArrow.y -= 10;
-				babyArrow.alpha = 0;
-				FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: 1}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
-			}
+			babyArrow.y -= 10 * i;
+			babyArrow.alpha = 0;
+			FlxTween.tween(babyArrow, {y: babyArrow.y + 10*i, alpha: 1}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
 
 			babyArrow.ID = i;
 
@@ -1570,6 +1579,7 @@ class PlayState extends MusicBeatState
 				unspawnNotes.splice(index, 1);
 			}
 		}
+			
 
 		if (generatedMusic)
 		{
@@ -1595,10 +1605,11 @@ class PlayState extends MusicBeatState
 						&& (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
 					{
 						var swagRect = new FlxRect(0, strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
-						swagRect.y /= daNote.scale.y;
-						swagRect.height -= swagRect.y;
+					swagRect.y /= daNote.scale.y;
+					swagRect.height -= swagRect.y;
 
-						daNote.clipRect = swagRect;
+					daNote.clipRect = swagRect;
+					// daNote.y += swagRect.height;
 					}
 
 					if (!daNote.mustPress && daNote.wasGoodHit)
@@ -2562,25 +2573,6 @@ class PlayState extends MusicBeatState
 
 	var curLight:Int = 0;
 
-	function mashViolation() {
-		if (mashes >= 22 && mashTimerA < mashTimeA) {
-			health -= 0.06;
-			mashVio++;
-			trace('HEY BUDDY DONT BUTTON MASH!! UR AT ', mashVio, "VIOLATIONs now :( u lose score & health !!");
-			trace('mf HIT', mashes, 'note');
-			songScore -= 200;
-			mashes = 0;
-			mashTimerA = 0;
-		}
-
-		if (mashTimerA >= mashTimeA) {
-			mashTimerA = 0;
-			trace('THE MAshes BE4 WE RESET:', mashes);
-			trace('mash timer A DONE ');
-			mashes = 0;
-			}
-		}
-
 		function createNoteSplash(note:Note) {
 			
 			//TODO: fix note splash positions
@@ -2612,25 +2604,20 @@ class PlayState extends MusicBeatState
 			
 		}
 
-		// premade note function shit lmao
-
-	function damageNote(val:Float, ?safety:Float) {
-		if (safety != null) {
-			if (health > safety)
-				health -= val;
+		// 4 modcharting
+		public function bfReplace(character:String = '') {
+			var oldX:Float = boyfriend.x;
+			var oldY:Float = boyfriend.y;
+			remove(boyfriend);
+			boyfriend = new Boyfriend(oldX, oldY, character);
+			add(boyfriend);
 		}
-	}
 
-	function healNote(val:Float) {
-		health += val;
-	}
-
-	function shaderNote(daNote:Note, shader:FlxShader)
-		daNote.shader = shader;
-
-	function shaderBfNote(shader:FlxShader)
-		boyfriend.shader = shader;
-	
-	function shaderDadNote(shader:FlxShader)
-		dad.shader = shader;
+		public function dadReplace(character:String = '') {
+			var oldX:Float = dad.x;
+			var oldY:Float = dad.y;
+			remove(dad);
+			dad = new Character(oldX, oldY, character, false);
+			add(dad);
+		}
 }

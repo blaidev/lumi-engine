@@ -1,5 +1,6 @@
 package;
 
+import lime.utils.Assets;
 import flixel.FlxG;
 import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.utils.AssetType;
@@ -108,6 +109,10 @@ class Paths
 	inline static public function getSparrowAtlas(key:String, ?library:String)
 	{
 		return FlxAtlasFrames.fromSparrow(image(key, library), file('images/$key.xml', library));
+	}
+
+	inline static public function getXmlDialogue(key:String, ?library:String) {
+		return Xml.parse(Assets.getText(file('data/$key.xml', library)));	
 	}
 
 	inline static public function getPackerAtlas(key:String, ?library:String)

@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.math.FlxMath;
@@ -34,6 +35,8 @@ class Note extends FlxSprite
 
 	public static var noteTexPath:String = 'NOTE_assets';
 
+	var cols:Array<String> = ['purple', 'green', 'red', 'blue'];
+
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false)
 	{
 		super();
@@ -57,6 +60,7 @@ class Note extends FlxSprite
 		{
 			case 'school' | 'schoolEvil':
 				loadGraphic(Paths.image('weeb/pixelUI/arrows-pixels'), true, 17, 17);
+
 
 				animation.add('greenScroll', [6]);
 				animation.add('redScroll', [7]);
@@ -83,7 +87,7 @@ class Note extends FlxSprite
 
 			default:
 				frames = Paths.getSparrowAtlas(noteTexPath);
-
+				
 				animation.addByPrefix('greenScroll', 'green0');
 				animation.addByPrefix('redScroll', 'red0');
 				animation.addByPrefix('blueScroll', 'blue0');

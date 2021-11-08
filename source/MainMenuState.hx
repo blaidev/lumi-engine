@@ -181,13 +181,11 @@ class MainMenuState extends MusicBeatState
 						else
 						{
 							new FlxTimer().start(.65, _ -> {
-							FlxTween.tween(menuItems.members[curSelected], {x: FlxG.width / 2 - menuItems.members[curSelected].width / 2}, .5,{ease: FlxEase.backIn, onComplete: _ -> {
-								FlxTween.tween(menuItems.members[curSelected], {y: FlxG.height / 2 - menuItems.members[curSelected].height / 2}, .5, {ease: FlxEase.backIn, onComplete: _ -> {
-									
-								}});
+							FlxTween.tween(menuItems.members[curSelected], {x: FlxG.width / 2 - menuItems.members[curSelected].width / 2}, .5,{ease: FlxEase.backInOut, onComplete: _ -> {
+								FlxTween.tween(menuItems.members[curSelected], {y: FlxG.height / 2 - menuItems.members[curSelected].height / 2}, .5, {ease: FlxEase.backInOut});
 							}});
 						});
-							new FlxTimer().start(1.8, _ -> {
+							new FlxTimer().start(1.725, _ -> {
 								var daChoice:String = optionShit[curSelected];
 
 								switch (daChoice)
