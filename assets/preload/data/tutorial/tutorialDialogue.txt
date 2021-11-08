@@ -1,3 +1,0 @@
-:dad:Press WASD or Arrow keys to hit notes, or DFJK if you have it on
-:dad:Try to hit them good, so like you can get sicks for better scores
-:dad:If you miss your health will drain, make sure it doesn't drain all the way!

@@ -1,0 +1,5 @@
+<DialogueBox>
+    <DialogueText text="Press WASD or Arrow keys to hit notes, or DFJK if you have it on" character="dad"/>
+    <DialogueText text="Try to hit them good, so you can get sicks for better scores" character="dad"/>
+    <DialogueText text="If you miss, your health will drain, make sure it doesn't drain all the way!" character="dad"/>
+</DialogueBox>
