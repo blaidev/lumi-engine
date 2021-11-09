@@ -27,6 +27,10 @@ class DialogueBox extends FlxSpriteGroup
 	var dialogueList:Array<String> = [];
 	var characterList:Array<String> = [];
 
+	var actionList:Array<String> = [];
+
+	var waitTimes:Array<Float> = [];
+
 	var ind:Int = 0;
 
 	// SECOND DIALOGUE FOR THE PIXEL SHIT INSTEAD???
@@ -50,7 +54,7 @@ class DialogueBox extends FlxSpriteGroup
 	{
 		super();
 
-		xmlData = Xml.parse(_xmlData.toString());
+		xmlData = _xmlData;
 
 		try {
 		for (i in xmlData.firstElement().elements()) {
@@ -62,6 +66,11 @@ class DialogueBox extends FlxSpriteGroup
 				trace(i.get("text"));
 				characterList.push(i.get("character"));
 				trace(i);
+
+				actionList.push("Dialogue");
+				} else if (i.nodeName == 'Wait') {
+					waitTimes.push(Std.parseFloat(i.get("time")));
+					actionList.push("Wait");
 				}
 		}
 	} catch (e) {

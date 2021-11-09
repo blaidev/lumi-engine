@@ -343,6 +343,7 @@ class TitleState extends MusicBeatState
 
 	override function beatHit()
 	{
+
 		super.beatHit();
 
 		logoBl.animation.play('bump');

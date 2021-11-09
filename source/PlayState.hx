@@ -1,5 +1,6 @@
 package;
 
+import funk.Funk;
 import modding.Mod;
 import lime.app.Event;
 import BetterRating.Ratings;
@@ -61,6 +62,8 @@ class PlayState extends MusicBeatState
 	public static var storyPlaylist:Array<String> = [];
 	public static var storyDifficulty:Int = 1;
 
+	public static var daBeat:Int;
+
 	public static var currentBeat:Int;
 	public static var currentStep:Int;
 
@@ -68,22 +71,22 @@ class PlayState extends MusicBeatState
 
 	private var vocals:FlxSound;
 
-	private var dad:Character;
-	private var gf:Character;
+	public static var dad:Character;
+	public static var gf:Character;
 	public static var boyfriend:Boyfriend;
 
-	private var notes:FlxTypedGroup<Note>;
-	private var unspawnNotes:Array<Note> = [];
+	public static var notes:FlxTypedGroup<Note>;
+	public static var unspawnNotes:Array<Note> = [];
 
 	public static var strumLine:FlxSprite;
 	private var curSection:Int = 0;
 
-	private var camFollow:FlxObject;
+	public static var camFollow:FlxObject;
 
 	private static var prevCamFollow:FlxObject;
 
-	private var strumLineNotes:FlxTypedGroup<FlxSprite>;
-	private var playerStrums:FlxTypedGroup<FlxSprite>;
+	public static var strumLineNotes:FlxTypedGroup<StaticArrow>;
+	public static var playerStrums:FlxTypedGroup<StaticArrow>;
 
 	private var camZooming:Bool = false;
 	private var curSong:String = "";
@@ -156,11 +159,15 @@ class PlayState extends MusicBeatState
 
 	var dialogueExists:Bool = true;
 
+	var daModShit:Funk;
+
 	override public function create()
 	{
 
-		// ModData.funcs.push(bfReplace);
-		// ModData.funcs.push(dadReplace);
+		health = 1;
+
+		daModShit = new Funk(Paths.hscript('senpaiMod', 'preload'));
+		daModShit.setRawSource('trace(curBeat)');
 
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
@@ -700,10 +707,10 @@ class PlayState extends MusicBeatState
 		}
 		strumLine.scrollFactor.set();
 
-		strumLineNotes = new FlxTypedGroup<FlxSprite>();
+		strumLineNotes = new FlxTypedGroup<StaticArrow>();
 		add(strumLineNotes);
 
-		playerStrums = new FlxTypedGroup<FlxSprite>();
+		playerStrums = new FlxTypedGroup<StaticArrow>();
 
 		// startCountdown();
 
@@ -742,6 +749,7 @@ class PlayState extends MusicBeatState
 
 		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
 			'health', 0, 2);
+
 		healthBar.scrollFactor.set();
 		healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33);
 		// healthBar
@@ -1328,6 +1336,10 @@ class PlayState extends MusicBeatState
 				}
 				// phillyCityLights.members[curLight].alpha -= (Conductor.crochet / 1000) * FlxG.elapsed;
 		}
+
+		daModShit.runCode();
+
+		daModShit.shareVars();
 
 		super.update(elapsed);
 
