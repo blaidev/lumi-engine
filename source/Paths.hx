@@ -62,7 +62,7 @@ class Paths
 	}
 
 	inline static public function hscript(key:String, ?library:String) {
-		return getPath('data/$key.funk', TEXT, library);
+		return getPath('data/$key.hxs', TEXT, library);
 	}
 
 	inline static public function xml(key:String, ?library:String)

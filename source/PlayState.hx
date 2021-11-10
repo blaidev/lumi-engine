@@ -1,13 +1,14 @@
 package;
 
+import cpp.Float32;
 import funk.Funk;
-import modding.Mod;
 import lime.app.Event;
 import BetterRating.Ratings;
 import BetterRating.Etterna;
 import flixel.system.FlxAssets.FlxShader;
 #if desktop
 import Discord.DiscordClient;
+import cpp.Pointer;
 #end
 import Section.SwagSection;
 import Song.SwagSong;
@@ -150,25 +151,16 @@ class PlayState extends MusicBeatState
 	var detailsPausedText:String = "";
 	#end
 
-	// mash vio shit so u cant just spam in ghosttapping lmao
-	var mashVio:Int = 0;
-	var mashes = 0;
-	var altMashes = 0;
-	var mashTimerA:Float = 0;
-	var mashTimeA:Float = 2.0;
-
 	var dialogueExists:Bool = true;
 
-	var daModShit:Funk;
+	var modCode:Funk;
 
 	override public function create()
 	{
 
+		modCode = new Funk('');
 		health = 1;
-
-		daModShit = new Funk(Paths.hscript('senpaiMod', 'preload'));
-		daModShit.setRawSource('trace(curBeat)');
-
+		
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
@@ -1295,6 +1287,7 @@ class PlayState extends MusicBeatState
 
 	function resyncVocals():Void
 	{
+
 		vocals.pause();
 
 		FlxG.sound.music.play();
@@ -1309,9 +1302,21 @@ class PlayState extends MusicBeatState
 
 	override public function update(elapsed:Float)
 	{
+
 		#if !debug
 		perfectMode = false;
 		#end
+
+		modCode.setRawSource("
+		if (curBeat % 4 == 0) {
+			trace('hit 4th beat');
+		}
+		");
+
+		modCode.shareVars();
+		modCode.runCode();
+		
+
 
 		if (FlxG.keys.justPressed.NINE)
 		{
@@ -1337,13 +1342,7 @@ class PlayState extends MusicBeatState
 				// phillyCityLights.members[curLight].alpha -= (Conductor.crochet / 1000) * FlxG.elapsed;
 		}
 
-		daModShit.runCode();
-
-		daModShit.shareVars();
-
 		super.update(elapsed);
-
-		mashTimerA += elapsed;
 
 		scoreTxt.text = "Score:" + songScore;
 
@@ -2161,12 +2160,6 @@ class PlayState extends MusicBeatState
 			else
 			{
 				badNoteCheck();
-			}
-		}
-
-		if ((upP || rightP || downP || leftP) && !boyfriend.stunned && generatedMusic) {
-			if (FlxG.save.data.ghost) {
-				mashes++;
 			}
 		}
 
