@@ -1,5 +1,6 @@
 package;
 
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -10,6 +11,10 @@ import polymod.format.ParseRules.TargetSignatureElement;
 #end
 
 using StringTools;
+
+class NoteHandler {
+	public static var allNotes:Array<Note> = [];
+}
 
 class Note extends FlxSprite
 {
@@ -37,6 +42,10 @@ class Note extends FlxSprite
 
 	var cols:Array<String> = ['purple', 'green', 'red', 'blue'];
 
+	public var xOffset:Float = 0;
+	public var yOffset:Float = 0;
+	public var sustainParent:Note;
+
 	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false)
 	{
 		super();
@@ -46,6 +55,8 @@ class Note extends FlxSprite
 
 		this.prevNote = prevNote;
 		isSustainNote = sustainNote;
+
+		NoteHandler.allNotes.push(this);
 
 		x += 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?

@@ -63,7 +63,7 @@ class Funk extends FlxBasic {
      * Executes HScript code
      */
     public function runCode() {
-        interp.execute(parser.parseString(code));
+        interp.execute(codeToRun);
     };
 
     /**
@@ -91,7 +91,10 @@ class Funk extends FlxBasic {
         interp.variables.set("storyWeek", PlayState.storyWeek);
         interp.variables.set("storyPlaylist", PlayState.storyPlaylist);
         interp.variables.set("storyDifficulty", PlayState.storyDifficulty);
-
+        
+        interp.variables.set("StaticArrow", StaticArrow);
+        interp.variables.set("Alphabet", Alphabet);
+        interp.variables.set("DialogueBox", DialogueBox);
         interp.variables.set("FlxG", FlxG);
         interp.variables.set("FlxMath", FlxMath);
         interp.variables.set("Character", Character);

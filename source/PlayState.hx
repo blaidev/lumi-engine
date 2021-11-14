@@ -77,6 +77,8 @@ class PlayState extends MusicBeatState
 	public static var boyfriend:Boyfriend;
 
 	public static var notes:FlxTypedGroup<Note>;
+	public static var sustains:Array<Note> = [];
+	public static var sustainParents:Array<Note> = [];
 	public static var unspawnNotes:Array<Note> = [];
 
 	public static var strumLine:FlxSprite;
@@ -1307,12 +1309,6 @@ class PlayState extends MusicBeatState
 		perfectMode = false;
 		#end
 
-		modCode.setRawSource("
-		if (curBeat % 4 == 0) {
-			trace('hit 4th beat');
-		}
-		");
-
 		modCode.shareVars();
 		modCode.runCode();
 		
@@ -1594,8 +1590,27 @@ class PlayState extends MusicBeatState
 
 		if (generatedMusic)
 		{
+
 			notes.forEachAlive(function(daNote:Note)
 			{
+
+				if (daNote.isSustainNote) {
+					sustains.push(daNote);
+				}
+
+
+				// * sustain shit tracking
+				// * do cool stuff with this. IDK!!
+
+				if (daNote.isSustainNote && !daNote.prevNote.isSustainNote) {
+					daNote.sustainParent = daNote.prevNote;
+					sustainParents.push(daNote.sustainParent);
+				} else if (daNote.isSustainNote && daNote.prevNote.sustainParent != null) {
+					daNote.sustainParent = daNote.prevNote.sustainParent;
+				} else if (!daNote.isSustainNote && !daNote.prevNote.isSustainNote) {
+					daNote.sustainParent = null;
+				}
+
 				if (daNote.y > FlxG.height)
 				{
 					daNote.active = false;
@@ -1618,6 +1633,7 @@ class PlayState extends MusicBeatState
 						var swagRect = new FlxRect(0, strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
 					swagRect.y /= daNote.scale.y;
 					swagRect.height -= swagRect.y;
+					
 
 					daNote.clipRect = swagRect;
 					// daNote.y += swagRect.height;
@@ -1660,6 +1676,7 @@ class PlayState extends MusicBeatState
 				} else {daNote.y = (strumLine.y + (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(SONG.speed, 2)));
 
 					if (daNote.isSustainNote) {
+
 						if (daNote.animation.curAnim.name.endsWith("end") && daNote.prevNote != null)
 							{
 								daNote.y += daNote.prevNote.height + 9;
