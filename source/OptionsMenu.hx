@@ -20,6 +20,12 @@ class OptionsMenu extends MusicBeatState {
 	private static var callbacks:Array<Bool->String> = [];
 	private static var buttonNames:Array<String> = ['dfjk', 'down', 'ghost', 'splash'];
 	
+	/*
+	* someone please save me from this hellhole
+	* im begging you someone push something that makes
+	* the option code look sane
+	*/
+
 	var bg:FlxSprite;
 
 	var saveMap:Map<String, Dynamic>;
@@ -122,7 +128,9 @@ class OptionsMenu extends MusicBeatState {
 	function save() {
 		FlxG.save.flush();
 	}
-}
+} // *******88888888mjhhhjkjkkjhgfnnnnnnnnnnnnnnnjjjjjjjjjjjhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhmmmmfgjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjgh
+
+// * look th e comments re messy nd ufcked up mAN BUT mking an engine hurts. u 'll have to deal w it 
 
 class OptionButton extends FlxButtonPlus {
 

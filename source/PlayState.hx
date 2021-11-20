@@ -1594,13 +1594,12 @@ class PlayState extends MusicBeatState
 			notes.forEachAlive(function(daNote:Note)
 			{
 
+				// * sustain shit tracking
+				// * do cool stuff with this. IDK!!
+
 				if (daNote.isSustainNote) {
 					sustains.push(daNote);
 				}
-
-
-				// * sustain shit tracking
-				// * do cool stuff with this. IDK!!
 
 				if (daNote.isSustainNote && !daNote.prevNote.isSustainNote) {
 					daNote.sustainParent = daNote.prevNote;

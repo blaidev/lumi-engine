@@ -10,11 +10,15 @@ class NoteUtil {
     var notes:FlxTypedGroup<Note>;
     var staticNotes:FlxTypedGroup<StaticArrow>;
     
-    function getNotes(notes:FlxTypedGroup<Note>) {
-
+    public static function getNotes(notes:FlxTypedGroup<Note>) {
+        return PlayState.notes;
     }
     
-    function getStaticNotes(notes:FlxTypedGroup<StaticArrow>) {
-        
+    public static function getStaticNotes(notes:FlxTypedGroup<StaticArrow>) {
+        return PlayState.strumLineNotes;
+    }
+
+    function getPlayerStaticNotes(notes:FlxTypedGroup<StaticArrow>) {
+        return PlayState.playerStrums;
     }
 }

@@ -106,6 +106,7 @@ class Funk extends FlxBasic {
         interp.variables.set("Xml", Xml);
         interp.variables.set("StringTools", StringTools);
         interp.variables.set("CoolUtil", CoolUtil);  
+        interp.variables.set("NoteUtil", NoteUtil);
     }
 
 }
