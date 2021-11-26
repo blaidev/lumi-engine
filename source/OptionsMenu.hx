@@ -18,7 +18,7 @@ import lime.utils.Assets;
 class OptionsMenu extends MusicBeatState {
 	private var buttons:FlxTypedGroup<FlxButtonPlus>;
 	private static var callbacks:Array<Bool->String> = [];
-	private static var buttonNames:Array<String> = ['dfjk', 'down', 'ghost', 'splash'];
+	private static var buttonNames:Array<String> = ['dfjk', 'down', 'ghost', 'splash', 'heck'];
 	
 	/*
 	* someone please save me from this hellhole
@@ -34,7 +34,7 @@ class OptionsMenu extends MusicBeatState {
 		super();
 		FlxG.mouse.visible = true;
 		FlxG.mouse.enabled = true;
-		callbacks = [DFJK, downScroll, ghostTapping, noteSplash];
+		callbacks = [DFJK, downScroll, ghostTapping, noteSplash, Heckmode];
 
 
 		buttons = new FlxTypedGroup<FlxButtonPlus>();
@@ -44,6 +44,7 @@ class OptionsMenu extends MusicBeatState {
 			"downscroll" => FlxG.save.data.downscroll,
 			"ghost tapping" => FlxG.save.data.ghost,
 			"note splashes" => FlxG.save.data.notesplash
+		//	"Heck mode" => FlxG.save.data.heckmode
 		];
 
 		bg = new FlxSprite(-80).loadGraphic(Paths.image('menuDesat'));
@@ -83,7 +84,7 @@ class OptionsMenu extends MusicBeatState {
 		buttons.members[2].text = ghostTapping(false);
 		buttons.members[3].text = noteSplash(false);
 
-		var bruh = ["dfjk", "downscroll", "ghost tapping", "note splashes"];
+		var bruh = ["dfjk", "downscroll", "ghost tapping", "note splashes", "heck mode"];
 	}
 
 	public override function update(elapsed:Float) {
