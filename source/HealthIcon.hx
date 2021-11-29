@@ -23,7 +23,7 @@ class HealthIcon extends FlxSprite
 		animation.add('mom', [6, 7], 0, false, isPlayer);
 		animation.add('mom-car', [6, 7], 0, false, isPlayer);
 		animation.add('tankman', [8, 9], 0, false, isPlayer);
-		animation.add('face', [10, 11], 0, false, isPlayer);
+		animation.add('face', [10, 10], 0, false, isPlayer);
 		animation.add('dad', [12, 13], 0, false, isPlayer);
 		animation.add('senpai', [22, 22], 0, false, isPlayer);
 		animation.add('senpai-angry', [22, 22], 0, false, isPlayer);
@@ -36,7 +36,7 @@ class HealthIcon extends FlxSprite
 
 		animation.play(char);
 
-		if (PlayState.storyWeek == 7)
+		if (PlayState.storyWeek == 6)
 			antialiasing = false;
 		else
 			antialiasing = true;
