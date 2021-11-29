@@ -92,10 +92,10 @@ class PlayState extends MusicBeatState
 	public static var playerStrums:FlxTypedGroup<StaticArrow>;
 
 	private var camZooming:Bool = false;
-	private var curSong:String = "";
+	public static var curSong:String = "";
 
-	private var gfSpeed:Int = 1;
-	private var health:Float = 1;
+	public static var gfSpeed:Int = 1;
+	public static var health:Float = 1;
 	private var combo:Int = 0;
 
 	private var healthBarBG:FlxSprite;
